@@ -20,23 +20,30 @@ type Client struct {
 }
 
 // extractScheme detects if the url is http instead of https
-func extractScheme(rawurl string) (scheme, baseAddr string) {
+func extractScheme(rawurl string) (scheme, baseAddr string, err error) {
 	u, err := url.Parse(rawurl)
-	if err != nil || u.Scheme == "" || u.Host == "" {
-		return "https", rawurl
+	if err != nil {
+		return "", "", err
 	}
-	return u.Scheme, u.Host
+	if u.Scheme == "" || u.Host == "" {
+		return "https", rawurl, nil
+	}
+	return u.Scheme, u.Host, nil
 }
 
 // NewClient creates a new statusio client for the *public api*.
 // baseAddr is i.e. status.example.copm/api/v2/
-func NewClient(baseAddr string) *Client {
-	scheme, baseAddr := extractScheme(baseAddr)
-	return &Client{
+func NewClient(baseAddr string) (c Client, err error) {
+	scheme, baseAddr, err := extractScheme(baseAddr)
+	if err != nil {
+		return c, err
+	}
+	c = Client{
 		baseAddr: baseAddr,
 		client:   &http.Client{},
 		scheme:   scheme,
 	}
+	return c, err
 }
 
 type SummaryResponse struct {
