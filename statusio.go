@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-
-	"bosun.org/slog"
 )
 
 type Client struct {
@@ -146,7 +144,6 @@ func (c *Client) request(path string, s interface{}) error {
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		slog.Error(err)
 		return err
 	}
 	req.Header.Set("Accept", "application/json")
